@@ -11,14 +11,21 @@ class ClientData:
     latitude = ValidType(Decimal)
     longitude = ValidType(Decimal)
     status = ValidType(Status)
+    count_clients = 1
 
     def __init__(self):
+        self.id = self.count_clients
+        ClientData.count_clients += 1
         self.up = False
         self.right = True
 
     def __str__(self):
-        return (f"Header: {self.header} Device id: {self.device_id} Timestamp: {self.timestamp} "
-                f"Latitude: {self.latitude:.4f} Longitude: {self.longitude:.4f} Status: {self.status.value}")
+        return (f"header: {self.header} device_id: {self.device_id} timestamp: {self.timestamp} "
+                f"latitude: {self.latitude:.4f} longitude: {self.longitude:.4f} status: {self.status.value}")
+
+    def __repr__(self):
+        return (f"header: {self.header} device_id: {self.device_id} timestamp: {self.timestamp} "
+                f"latitude: {self.latitude:.4f} longitude: {self.longitude:.4f} status: {self.status.value}")
 
     def start_mocking(self):
         self.right = not self.right
@@ -30,3 +37,5 @@ class ClientData:
             else:
                 self.longitude = self.longitude + Decimal(-0.05)
         self.up = not self.up
+        self.timestamp = datetime.now()
+
