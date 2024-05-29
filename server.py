@@ -1,3 +1,6 @@
+from classes.ClientData import ClientData
+from classes.Status import Status
+from decimal import Decimal
 import datetime
 import socket
 import select
@@ -22,6 +25,34 @@ print("Server is listening...")
 sockets_list = [server_socket]
 # List of connected clients - socket as a key, user header and name as data
 clients = {}
+
+
+def parse_data(string_data):
+    client = ClientData()
+    client.header = string_data.split("header: ")[1].split()[0]
+    client.device_id = int(string_data.split("device_id: ")[1].split()[0])
+    date = string_data.split("timestamp: ")[1].split()
+    client.timestamp = datetime.datetime.strptime(date[0] + " " + date[1], '%Y-%m-%d %H:%M:%S')
+    client.latitude = Decimal(string_data.split("latitude: ")[1].split()[0])
+    client.longitude = Decimal(string_data.split("longitude: ")[1].split()[0])
+    status = string_data.split("status: ")[1].split()[0]
+    if len(status) == 1:
+        client.status = Status(int(string_data.split("status: ")[1].split()[0]))
+    else:
+        client.status = Status(string_data.split("status: ")[1].split()[0])
+    return client
+
+
+def calc_routh(client):
+    return ""
+
+
+def distance_from_start(client):
+    return ""
+
+
+def count_same_latitude(client):
+    return ""
 
 
 def receive_mock(client_socket):
@@ -59,20 +90,24 @@ while True:
             # Also save userid and userid header
             clients[client_socket] = user
 
-            print(f"Accepted new connection from {client_address[0]}:{client_address[1]} id: {user['data'].decode('utf-8')} time: {datetime.datetime.now()}")
+            print(f"Accepted new connection from {client_address[0]}:{client_address[1]} "
+                  f"id: {user['data'].decode('utf-8')} time: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         else:
             message = receive_mock(notified_socket)
             if message is False:
-                print(f"Closed connection from id: {clients[notified_socket]['data'].decode('utf-8')} time: {datetime.datetime.now()}")
+                print(f"Closed connection from id: {clients[notified_socket]['data'].decode('utf-8')} "
+                      f"time: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
                 sockets_list.remove(notified_socket)
                 del clients[notified_socket]
                 continue
 
             user = clients[notified_socket]
-            data = message['data'].decode('utf-8').split("device_id: ")[1].split()[0]
-            with open(f"data/{data}.txt", 'a') as file:
-                file.write(message['data'].decode('utf-8')+"\n")
-            print(f"received message from id: {user['data'].decode('utf-8')} time: {datetime.datetime.now()}")
+            client_data = parse_data(message['data'].decode('utf-8'))
+            print(client_data)
+            with open(f"data/{client_data.device_id}.txt", 'a') as file:
+                file.write(f"{client_data}"+"\n")
+            print(f"received message from id: {user['data'].decode('utf-8')} "
+                  f"time: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
     for notified_socket in exception_sockets:
         sockets_list.remove(notified_socket)

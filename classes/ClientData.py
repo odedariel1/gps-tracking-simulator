@@ -27,6 +27,13 @@ class ClientData:
         return (f"header: {self.header} device_id: {self.device_id} timestamp: {self.timestamp} "
                 f"latitude: {self.latitude:.4f} longitude: {self.longitude:.4f} status: {self.status.value}")
 
+    def __sub__(self, other):
+        if not isinstance(other, ClientData):
+            return NotImplemented
+        self.latitude -= other.latitude
+        self.longitude -= other.longitude
+        return self
+
     def start_mocking(self):
         self.right = not self.right
         if self.right:
@@ -37,5 +44,6 @@ class ClientData:
             else:
                 self.longitude = self.longitude + Decimal(-0.05)
         self.up = not self.up
-        self.timestamp = datetime.now()
+        self.timestamp = datetime.strptime(datetime.now().strftime('%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S')
+
 
