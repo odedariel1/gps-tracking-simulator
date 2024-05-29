@@ -4,6 +4,7 @@ from decimal import Decimal
 import datetime
 import socket
 import select
+from collections import defaultdict
 
 header_length = 10
 ip = "127.0.0.1"
@@ -44,15 +45,33 @@ def parse_data(string_data):
 
 
 def calc_routh(client):
-    return ""
+    routh = 0
+    with open(f"data/{client.device_id}.txt", 'r') as file:
+        temp_2 = parse_data(file.readline())
+        for line in file:
+            temp_client = parse_data(line)
+            routh += abs(temp_2.latitude - temp_client.latitude) + abs(temp_2.longitude - temp_client.longitude)
+            temp_2 = temp_client
+    return routh
 
 
 def distance_from_start(client):
-    return ""
+    with open(f"data/{client.device_id}.txt", 'r') as file:
+        temp_2 = parse_data(file.readline())
+    return abs(temp_2.latitude - client.latitude) + abs(temp_2.longitude - client.longitude)
 
 
 def count_same_latitude(client):
-    return ""
+    count_dic = defaultdict(int)
+    with open(f"data/{client.device_id}.txt", 'r') as file:
+        for line in file:
+            temp_client = parse_data(line)
+            count_dic[f'{temp_client.latitude}'] += 1
+    count = 0
+    for value in count_dic.values():
+        if value > 1:
+            count += value
+    return count
 
 
 def receive_mock(client_socket):
@@ -96,18 +115,20 @@ while True:
             message = receive_mock(notified_socket)
             if message is False:
                 print(f"Closed connection from id: {clients[notified_socket]['data'].decode('utf-8')} "
-                      f"time: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+                      f"time: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')} "
+                      f"total routh:{calc_routh(client_data)} "
+                      f"error 0.10: {count_same_latitude(client_data)}")
                 sockets_list.remove(notified_socket)
                 del clients[notified_socket]
                 continue
-
-            user = clients[notified_socket]
             client_data = parse_data(message['data'].decode('utf-8'))
+            user = clients[notified_socket]
             print(client_data)
             with open(f"data/{client_data.device_id}.txt", 'a') as file:
                 file.write(f"{client_data}"+"\n")
             print(f"received message from id: {user['data'].decode('utf-8')} "
-                  f"time: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+                  f"time: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')} "
+                  f"distance from start:{distance_from_start(client_data)} ")
 
     for notified_socket in exception_sockets:
         sockets_list.remove(notified_socket)

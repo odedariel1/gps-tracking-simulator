@@ -11,7 +11,7 @@ def client_socket_func(client):
     header_length = 10
     ip = "127.0.0.1"
     port = 1234
-    my_username = f"{client.id}"
+    my_userid = f"{client.id}"
     # Create a socket
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -25,11 +25,11 @@ def client_socket_func(client):
         # Prepare username and header and send them
         # We need to encode username to bytes
         # then count number of bytes and prepare header of fixed size, that we encode to bytes as well
-        username = my_username.encode('utf-8')
-        username_header = f"{len(username):<{header_length}}".encode('utf-8')
-        client_socket.send(username_header + username)
-        print(username_header + username)
-        while True:
+        userid = my_userid.encode('utf-8')
+        userid_header = f"{len(userid):<{header_length}}".encode('utf-8')
+        client_socket.send(userid_header + userid)
+        print(userid_header + userid)
+        for _ in range(0, 10):
 
             # Wait for user to input a message
             message = f"{client}"
@@ -43,7 +43,7 @@ def client_socket_func(client):
                 client_socket.send(message_header + message)
                 print(message)
                 client.start_mocking()
-            time.sleep(10)
+            time.sleep(2)
 
     except Exception as e:
         # Any other exception - something happened, exit
