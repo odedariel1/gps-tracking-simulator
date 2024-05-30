@@ -37,13 +37,13 @@ class ClientData:
     def start_mocking(self):
         self.right = not self.right
         if self.right:
-            self.latitude = self.latitude + Decimal(0.05)
+            self.longitude = self.longitude + Decimal(0.05)
         else:
             if self.up:
-                self.longitude = self.longitude + Decimal(0.05)
+                self.latitude = self.latitude + Decimal(0.1)
             else:
-                self.longitude = self.longitude + Decimal(-0.05)
-        self.up = not self.up
+                self.latitude = self.latitude - Decimal(0.1)
+            self.up = not self.up
         self.timestamp = datetime.strptime(datetime.now().strftime('%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S')
 
 

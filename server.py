@@ -5,6 +5,9 @@ import datetime
 import socket
 import select
 from collections import defaultdict
+import os
+import gmplot
+import math
 
 header_length = 10
 ip = "127.0.0.1"
@@ -28,6 +31,46 @@ sockets_list = [server_socket]
 clients = {}
 
 
+def show_map():
+    # Define your latitude and longitude points
+    points = []
+    folder = "data"
+    for file_name in os.listdir(folder):
+        file_path = os.path.join(folder, file_name)
+        if os.path.isfile(file_path):
+            with open(file_path,'r') as file:
+                for line in file:
+                    points.append({"latitude": Decimal(line.split("latitude: ")[1].split()[0]),
+                                   "longitude": Decimal(line.split("longitude: ")[1].split()[0]),
+                                   "name": f"{file_name}"})
+
+    # Calculate the center of the map
+    avg_lat = sum(point["latitude"] for point in points) / len(points)
+    avg_lon = sum(point["longitude"] for point in points) / len(points)
+
+    # Create a gmplot object centered around the average latitude and longitude
+    gmap = gmplot.GoogleMapPlotter(avg_lat, avg_lon, 5)
+
+    # Group points by "name"
+    points_by_name = defaultdict(list)
+    for point in points:
+        points_by_name[point["name"]].append(point)
+
+    # Plot the points and routes by "name"
+    for name, pts in points_by_name.items():
+        latitudes = [point["latitude"] for point in pts]
+        longitudes = [point["longitude"] for point in pts]
+
+        # Scatter plot for the points
+        gmap.scatter(latitudes, longitudes, color='maroon', size=50, marker=True)
+
+        # Plot the route connecting the points
+        gmap.plot(latitudes, longitudes, 'lightblue', edge_width=2.5)
+
+    # Save the map to an HTML file
+    gmap.draw(f'google_map.html')
+
+
 def parse_data(string_data):
     client = ClientData()
     client.header = string_data.split("header: ")[1].split()[0]
@@ -44,13 +87,28 @@ def parse_data(string_data):
     return client
 
 
+def haversine(lat1, lon1, lat2, lon2):
+    # Convert decimal degrees to radians
+    lat1, lon1, lat2, lon2 = map(lambda x: round(math.radians(x), 5), [lat1, lon1, lat2, lon2])
+    # Haversine formula
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    a = math.sin(dlat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
+    c = 2 * math.asin(math.sqrt(a))
+    # Radius of Earth in kilometers. Use 3956 for miles.
+    r = 6371
+    # Calculate the distance
+    distance = c * r
+    return round(distance, 4)
+
+
 def calc_routh(client):
     routh = 0
     with open(f"data/{client.device_id}.txt", 'r') as file:
         temp_2 = parse_data(file.readline())
         for line in file:
             temp_client = parse_data(line)
-            routh += abs(temp_2.latitude - temp_client.latitude) + abs(temp_2.longitude - temp_client.longitude)
+            routh += haversine(temp_client.latitude, temp_client.longitude, temp_2.latitude, temp_2.longitude)
             temp_2 = temp_client
     return routh
 
@@ -58,7 +116,7 @@ def calc_routh(client):
 def distance_from_start(client):
     with open(f"data/{client.device_id}.txt", 'r') as file:
         temp_2 = parse_data(file.readline())
-    return abs(temp_2.latitude - client.latitude) + abs(temp_2.longitude - client.longitude)
+    return haversine(client.latitude, client.longitude, temp_2.latitude, temp_2.longitude)
 
 
 def count_same_latitude(client):
@@ -116,8 +174,9 @@ while True:
             if message is False:
                 print(f"Closed connection from id: {clients[notified_socket]['data'].decode('utf-8')} "
                       f"time: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')} "
-                      f"total routh:{calc_routh(client_data)} "
+                      f"total routh:{calc_routh(client_data)} kilometers "
                       f"error 0.10: {count_same_latitude(client_data)}")
+                show_map()
                 sockets_list.remove(notified_socket)
                 del clients[notified_socket]
                 continue
@@ -128,7 +187,7 @@ while True:
                 file.write(f"{client_data}"+"\n")
             print(f"received message from id: {user['data'].decode('utf-8')} "
                   f"time: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')} "
-                  f"distance from start:{distance_from_start(client_data)} ")
+                  f"distance from start:{distance_from_start(client_data)} kilometers")
 
     for notified_socket in exception_sockets:
         sockets_list.remove(notified_socket)
