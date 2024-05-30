@@ -12,7 +12,7 @@ def client_socket_func(client):
     header_length = 10
     ip = "127.0.0.1"
     port = 1234
-    my_userid = f"{client.id}"
+    my_userid = f"{client.device_id}"
     # Create a socket
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -44,7 +44,7 @@ def client_socket_func(client):
                 client_socket.send(message_header + message)
                 print(message)
                 client.start_mocking()
-            time.sleep(1)
+            time.sleep(20)
 
     except Exception as e:
         # Any other exception - something happened, exit

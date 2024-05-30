@@ -176,7 +176,6 @@ while True:
                       f"time: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')} "
                       f"total routh:{calc_routh(client_data)} kilometers "
                       f"error 0.10: {count_same_latitude(client_data)}")
-                show_map()
                 sockets_list.remove(notified_socket)
                 del clients[notified_socket]
                 continue
@@ -188,6 +187,7 @@ while True:
             print(f"received message from id: {user['data'].decode('utf-8')} "
                   f"time: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')} "
                   f"distance from start:{distance_from_start(client_data)} kilometers")
+            show_map()
 
     for notified_socket in exception_sockets:
         sockets_list.remove(notified_socket)

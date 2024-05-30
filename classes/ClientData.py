@@ -11,11 +11,8 @@ class ClientData:
     latitude = ValidType(Decimal)
     longitude = ValidType(Decimal)
     status = ValidType(Status)
-    count_clients = 1
 
     def __init__(self):
-        self.id = self.count_clients
-        ClientData.count_clients += 1
         self.up = False
         self.right = True
 
