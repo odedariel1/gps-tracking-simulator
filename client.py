@@ -7,7 +7,6 @@ import time
 import threading
 from decorator.decorator import _decorator
 
-@_decorator
 def client_socket_func(client):
     header_length = 10
     ip = "127.0.0.1"

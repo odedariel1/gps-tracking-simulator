@@ -9,28 +9,6 @@ import os
 import gmplot
 import math
 
-header_length = 10
-ip = "127.0.0.1"
-port = 1234
-
-# Create a socket object
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# Set Reconnection
-server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
-# Bind the socket to the host and a port
-server_socket.bind((ip, port))
-
-# Start listening for incoming connections
-server_socket.listen()
-print("Server is listening...")
-
-# List of sockets for select.select()
-sockets_list = [server_socket]
-# List of connected clients - socket as a key, user header and name as data
-clients = {}
-
-
 def show_map():
     # Define your latitude and longitude points
     points = []
@@ -146,6 +124,28 @@ def receive_mock(client_socket):
     except Exception as e:
         print(f"An error occurred: {e}")
         return False
+
+
+header_length = 10
+ip = "127.0.0.1"
+port = 1234
+
+# Create a socket object
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# Set Reconnection
+server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+# Bind the socket to the host and a port
+server_socket.bind((ip, port))
+
+# Start listening for incoming connections
+server_socket.listen()
+print("Server is listening...")
+
+# List of sockets for select.select()
+sockets_list = [server_socket]
+# List of connected clients - socket as a key, user header and name as data
+clients = {}
 
 
 while True:
