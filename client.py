@@ -3,11 +3,11 @@ from classes.Status import Status
 from datetime import datetime
 from decimal import Decimal
 import socket
-import sys
 import time
 import threading
+from decorator.decorator import _decorator
 
-
+@_decorator
 def client_socket_func(client):
     header_length = 10
     ip = "127.0.0.1"
@@ -49,7 +49,6 @@ def client_socket_func(client):
     except Exception as e:
         # Any other exception - something happened, exit
         print(f'Reading error: {e}')
-        sys.exit()
 
     finally:
         client_socket.close

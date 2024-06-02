@@ -38,7 +38,7 @@ def show_map():
     for file_name in os.listdir(folder):
         file_path = os.path.join(folder, file_name)
         if os.path.isfile(file_path):
-            with open(file_path,'r') as file:
+            with open(file_path, 'r') as file:
                 for line in file:
                     points.append({"latitude": Decimal(line.split("latitude: ")[1].split()[0]),
                                    "longitude": Decimal(line.split("longitude: ")[1].split()[0]),
