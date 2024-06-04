@@ -89,6 +89,8 @@ class TcpServer:
         print("Server shutdown complete.")
 
 
-if __name__ == "__main__":
+def main():
     server = TcpServer()
     server.start()
+
+main()
