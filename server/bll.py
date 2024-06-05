@@ -90,9 +90,9 @@ def distance_from_start(client: dict[str]) -> Decimal:
                      Decimal(temp_2["latitude"]), Decimal(temp_2["longitude"]))
 
 
-def count_same_latitude(client: dict) -> int:
+def count_same_latitude(device_id: str) -> int:
     count_dic = defaultdict(int)
-    data = json_reader(f"../data/{client["device_id"]}.json")
+    data = json_reader(f"../data/{device_id}.json")
     latitudes = [entry['latitude'] for entry in data]
     for lat in latitudes:
         count_dic[lat] += 1
