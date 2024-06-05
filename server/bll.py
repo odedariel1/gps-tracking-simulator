@@ -6,7 +6,7 @@ import math
 import json
 
 
-def save_data_to_file(data):
+def save_data_to_file(data: str):
     # Split the message by commas
     parts = data.split(',')
 
@@ -29,12 +29,12 @@ def save_data_to_file(data):
     json_writer(path, data_list)
 
 
-def json_writer(path, data):
+def json_writer(path: str, data: list):
     with open(path, 'w') as file:
         file.write(json.dumps(data, indent=4))
 
 
-def json_reader(path):
+def json_reader(path: str):
     try:
         with open(path, 'r') as file:
             return json.loads(file.read())
@@ -42,7 +42,7 @@ def json_reader(path):
         return []
 
 
-def parse_data(string_data) -> client_a or client_b:
+def parse_data(string_data: str) -> client_a or client_b:
     data = string_data.split(",")
     header = data[0]
     device_id = int(data[1])
@@ -57,7 +57,7 @@ def parse_data(string_data) -> client_a or client_b:
     return client
 
 
-def haversine(lat1, lon1, lat2, lon2) -> Decimal:
+def haversine(lat1: Decimal, lon1: Decimal, lat2: Decimal, lon2: Decimal) -> Decimal:
     # Convert decimal degrees to radians
     lat1, lon1, lat2, lon2 = map(lambda x: round(math.radians(x), 5), [lat1, lon1, lat2, lon2])
     # Haversine formula
@@ -72,7 +72,7 @@ def haversine(lat1, lon1, lat2, lon2) -> Decimal:
     return round(distance, 4)
 
 
-def calc_routh(device_id) -> Decimal:
+def calc_routh(device_id: str) -> Decimal:
     routh = 0
     file_data = json_reader(f"../data/{device_id}.json")
     temp_2 = file_data[0]
@@ -83,14 +83,14 @@ def calc_routh(device_id) -> Decimal:
     return routh
 
 
-def distance_from_start(client) -> Decimal:
+def distance_from_start(client: dict[str]) -> Decimal:
     file_data = json_reader(f"../data/{client["device_id"]}.json")
     temp_2 = file_data[0]
     return haversine(Decimal(client["latitude"]), Decimal(client["longitude"]),
                      Decimal(temp_2["latitude"]), Decimal(temp_2["longitude"]))
 
 
-def count_same_latitude(client) -> int:
+def count_same_latitude(client: dict) -> int:
     count_dic = defaultdict(int)
     data = json_reader(f"../data/{client["device_id"]}.json")
     latitudes = [entry['latitude'] for entry in data]
@@ -103,7 +103,7 @@ def count_same_latitude(client) -> int:
     return count
 
 
-def show_all_point_from_last_minute(device_id) -> [dict]:
+def show_all_point_from_last_minute(device_id: str) -> [dict]:
     file_data = json_reader(f"../data/{device_id}.json")
     # Convert timestamps to datetime objects
     for point in file_data:

@@ -24,7 +24,7 @@ class TcpServer:
         self.outputs = []
         print(f"Server started on {self.host}:{self.port}")
 
-    def handle_client_data(self, client_socket):
+    def handle_client_data(self, client_socket) -> bool:
         try:
             # Receive data from the client (up to 1024 bytes)
             data = client_socket.recv(1024)

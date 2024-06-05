@@ -5,7 +5,7 @@ device = input("enter device id:")
 device_data = bll.json_reader(f"../data/{device}.json")
 
 if len(device_data) == 0:
-    print("device dosent exist")
+    print("device doesnt exist")
 else:
     data_list = bll.show_all_point_from_last_minute(device)
     for data in data_list:

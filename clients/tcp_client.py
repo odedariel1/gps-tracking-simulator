@@ -1,7 +1,7 @@
 from datetime import datetime,timezone
 from decimal import Decimal
 from classes import client_a, client_b
-import socket  # Import the socket module to create a TCP client
+import socket
 import threading
 import time
 
@@ -13,11 +13,11 @@ class TCPClient:
         # Create a socket object with IPv4 addressing (AF_INET) and TCP protocol (SOCK_STREAM)
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    def connect(self, device_id):
+    def connect(self, device_id: int):
         self.client_socket.connect((self.host, self.port))  # Connect to the server
         print(f"Connected to server at {self.host}:{self.port} device_id:{device_id}")
 
-    def send_gps(self, data):
+    def send_gps(self, data: client_a or client_b):
         self.client_socket.send(f"{data}".encode('utf-8'))  # Send the message to the server
 
     def close(self):
@@ -25,7 +25,7 @@ class TCPClient:
         print("Client socket closed.")
 
 
-def main(client_data):
+def main(client_data: client_a or client_b):
     client = TCPClient()  # Create an instance of the TCPClient class
     try:
         client.connect(client_data.device_id)  # Connect to the server
