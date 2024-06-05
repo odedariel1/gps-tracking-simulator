@@ -71,7 +71,6 @@ class TcpServer:
                     self.inputs.remove(s)
                     s.close()
         except KeyboardInterrupt:
-            # Gracefully handle a keyboard interrupt (Ctrl+C)
             print("Server is shutting down.")
         except Exception as e:
             # Print any unexpected errors

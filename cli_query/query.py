@@ -1,6 +1,6 @@
 import server.bll as bll
 
-device = "987654321" #input("enter device id:")
+device = input("enter device id:")
 
 device_data = bll.json_reader(f"../data/{device}.json")
 

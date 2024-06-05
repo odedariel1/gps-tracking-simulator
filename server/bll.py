@@ -1,7 +1,7 @@
 from classes import client_a, client_b
 from collections import defaultdict
 from decimal import Decimal
-from datetime import datetime,timedelta
+from datetime import datetime, timedelta, timezone
 import math
 import json
 
@@ -107,10 +107,15 @@ def show_all_point_from_last_minute(device_id) -> [dict]:
     file_data = json_reader(f"../data/{device_id}.json")
     # Convert timestamps to datetime objects
     for point in file_data:
-        point['timestamp'] = datetime.strptime(point['timestamp'], '%Y-%m-%d %H:%M:%S.%f')
+        timestamp = datetime.strptime(point['timestamp'], '%Y-%m-%d %H:%M:%S.%f')
+        if point["status"] == '1':
+            # Assuming status '1' indicates local time
+            point['timestamp'] = timestamp.replace(tzinfo=timezone.utc)
+        else:
+            point['timestamp'] = timestamp.astimezone(timezone.utc)
     # Calculate the timestamp for the last minute
-    current_time = datetime.now()
-    last_minute = current_time - timedelta(minutes=30)
+    current_time = datetime.now(timezone.utc)
+    last_minute = current_time - timedelta(minutes=1)
     # Filter data points from the last minute
     filtered_data = [point for point in file_data if point['timestamp'] > last_minute]
 
